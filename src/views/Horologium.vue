@@ -1,10 +1,13 @@
 <template>
     <div>
+        <h2>
+            {{utcString}}
+        </h2>
         <h1>
-            {{timestring}}
+            {{localTime}}
         </h1>
         <h1>
-            {{time}}
+            {{today}}
         </h1>
     </div>
 </template>
@@ -34,6 +37,7 @@ export default {
         if(!timestring || this.time.invalid){
             this.time = DateTime.fromObject({zone:this.timezone})
         }
+        this.utc = this.time.toUTC()
     },
     name: "Horologium",
     data:function(){
@@ -43,9 +47,15 @@ export default {
             }
     },
     computed: {
-        timestring(){
-            return DateTime.utc().toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)
-        }
+        utcString(){
+            return `${this.utc.toLocaleString(DateTime.DATE_HUGE)} ${this.utc.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET)}`
+        },
+        localTime(){
+            return this.time.toLocaleString(DateTime.TIME_24_WITH_LONG_OFFSET)
+        },
+        today(){
+            return this.time.toLocaleString(DateTime.DATE_HUGE)
+        },
     }
 }
 </script>
