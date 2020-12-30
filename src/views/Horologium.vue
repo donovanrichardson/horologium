@@ -1,7 +1,12 @@
 <template>
-    <h1>
-        {{timestring}}
-    </h1>
+    <div>
+        <h1>
+            {{timestring}}
+        </h1>
+        <h1>
+            {{time}}
+        </h1>
+    </div>
 </template>
 
 <script>
@@ -11,10 +16,12 @@ console.log('datetime?', DateTime.utc());
 // console.log('thedata?', this.data);
 
 export default {
-    name: "UTC",
+    created(){
+        this.time = DateTime.utc().toLocaleString(DateTime.DATETIME_FULL_WITH_SECONDS)
+    },
+    name: "Horologium",
     data:function(){
         return {
-            // time:luxon.DateTime.utc()
             }
     },
     computed: {
