@@ -1,7 +1,7 @@
 <template>
-    <p>
+    <h1>
         {{timestring}}
-    </p>
+    </h1>
 </template>
 
 <script>

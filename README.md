@@ -1,4 +1,6 @@
-# horologium
+# Horologium
+
+A timestamp app
 
 ## Project setup
 ```
