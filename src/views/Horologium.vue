@@ -1,29 +1,35 @@
 <template>
     <div>
-        <h2>
-            {{utcString}}
-        </h2>
-        <h1>
-            {{chosenTime}}
-        </h1>
-        <h1>
-            {{chosenDate}}
-        </h1>
-        <div v-if="localZone != timezone">
+        <div class="timegroup">
+            <h2>
+                {{utcString}}
+            </h2>
+        </div>
+        <div class="timegroup">
+            <h1>
+                {{chosenTime}}
+            </h1>
+            <h1>
+                {{chosenDate}}
+            </h1>
+        </div>
+        <div class="timegroup"  v-if="localZone != timezone">
             <h2>
                 {{localString}}
             </h2>
         </div>
-        <h2>
-            {{unixString}}
-        </h2>
+        <div class="timegroup">
+            <h2>
+                {{unixString}}
+            </h2>
+        </div>
         <button v-on:click="share">
             Share this moment (copies url to this moment to the clipboard)
         </button>
         <div>
-            <h3>
-                Set the date and time!
-            </h3>
+            <h4>
+                Set the date and time below!
+            </h4>
             <form id='datetime-edit' v-on:submit.prevent="changeTime">
                 <div>
                     <input type='date' v-model="selectedDate"/>
@@ -34,7 +40,7 @@
                 <button>Change Date</button>
             </form>
             <button :class="{hidden: !fixed}" @click="()=> {this.fixed=false; this.startClockIfNotFixed()}">
-                Set Current Time
+                Reset to Current Time
             </button>
         </div>
     </div>
@@ -43,18 +49,47 @@
 .hidden{
     visibility:hidden;
 }
+h1, h2, h3{
+    padding: .05em;
+}
+
+.timegroup{
+    border-top: 1px solid black;
+}
+
+h4, button, input{
+    margin:.2em;
+}
+
+button, input{
+    border-radius: 10px;
+}
+
+input{
+    border:none;
+    background: #ddd;
+    
+}
 </style>
 
 <script>
 import { DateTime, Settings, IANAZone } from "luxon";
 import copy from 'copy-to-clipboard'
+import {getTimeZones} from "@vvo/tzdb";
 
 console.log('datetime', DateTime);
 console.log('copy', copy);
-// console.log('thedata?', this.data);
 
 export default {
     created(){
+        this.tz = getTimeZones()
+
+        this.tz.sort((z1, z2)=>{
+            return z1.currentTimeOffsetInMinutes - z2.currentTimeOffsetInMinutes || z1.name.localeCompare(z2.name)
+        })
+
+        console.log('zones', this.tz);
+        
         console.log("route", this.$route);
         console.log("zone", IANAZone);
         this.localZone = Settings.defaultZoneName
@@ -90,6 +125,7 @@ export default {
                 selectedDate:null,
                 selectedTime:null,
                 clockBattery:null,
+                tz:null,
                 original:Math.floor(4.5)
                 //for some reason, commenting out time and timezone prevents the every-second updating
             }
@@ -124,6 +160,7 @@ export default {
         },
         startClockIfNotFixed: function(){
             if(!this.fixed){
+                this.time = DateTime.fromObject({zone:this.timezone})
                 const startOfSecond = this.time.plus({seconds:1}).startOf('second') + 1 - this.time
                 setTimeout(()=>{
                     this.time = DateTime.fromObject({zone:this.timezone}) //maybe put this starting at if(!timestring || this.time.invalid){; abstract the time assignment
