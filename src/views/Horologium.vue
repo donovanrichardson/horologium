@@ -7,16 +7,16 @@
             {{chosenTime}}
         </h1>
         <h1>
-            {{chosenDay}}
+            {{chosenDate}}
         </h1>
         <div v-if="localZone != timezone">
             <h2>
                 {{localString}}
             </h2>
         </div>
-        <h1>
+        <h2>
             {{unixString}}
-        </h1>
+        </h2>
         <button v-on:click="share">
             Share this moment (copies url to this moment to the clipboard)
         </button>
@@ -24,18 +24,26 @@
             <h3>
                 Set the date and time!
             </h3>
-            <div id='datetime-edit' v-on:click="clicky">
+            <form id='datetime-edit' v-on:submit.prevent="changeTime">
                 <div>
-                    <input type="date" :value="time.toFormat('yyyy-MM-dd')"/>
+                    <input type='date' v-model="selectedDate"/>
                 </div>
                 <div>
-                    <input type="time" :value="time.toFormat('HH:mm')"/>
+                    <input type="time" v-model="selectedTime"/>
                 </div>
-            </div>
-
+                <button>Change Date</button>
+            </form>
+            <button :class="{hidden: !fixed}" @click="()=> {this.fixed=false; this.startClockIfNotFixed()}">
+                Set Current Time
+            </button>
         </div>
     </div>
 </template>
+<style scoped>
+.hidden{
+    visibility:hidden;
+}
+</style>
 
 <script>
 import { DateTime, Settings, IANAZone } from "luxon";
@@ -67,23 +75,21 @@ export default {
             this.time = DateTime.fromObject({zone:this.timezone})
             this.fixed = false
         }
+        this.selectedDate = this.time.toFormat('yyyy-MM-dd')
+        this.selectedTime = this.time.toFormat('HH:mm')
+        console.log("it ran", this.selectedTime);
         
 
-        if(!this.fixed){
-            const startOfSecond = this.time.plus({seconds:1}).startOf('second') + 1 - this.time
-            setTimeout(()=>{
-                this.time = DateTime.fromObject({zone:this.timezone}) //maybe put this starting at if(!timestring || this.time.invalid){; abstract the time assignment
-                setInterval(()=>{
-                    this.time = DateTime.fromObject({zone:this.timezone})
-                },1000)
-            },startOfSecond)
-        }
+        this.startClockIfNotFixed()
     },
     name: "Horologium",
     data:function(){
         return {
                 time:null,
                 timezone:null,
+                selectedDate:null,
+                selectedTime:null,
+                clockBattery:null,
                 original:Math.floor(4.5)
                 //for some reason, commenting out time and timezone prevents the every-second updating
             }
@@ -96,7 +102,7 @@ export default {
         chosenTime(){
             return this.time.toLocaleString(DateTime.TIME_24_WITH_LONG_OFFSET)
         },
-        chosenDay(){
+        chosenDate(){
             return this.time.toLocaleString(DateTime.DATE_HUGE)
         },
         localString(){
@@ -115,6 +121,22 @@ export default {
         },
         clicky: function(e){
             console.log("ive been clicked")
+        },
+        startClockIfNotFixed: function(){
+            if(!this.fixed){
+                const startOfSecond = this.time.plus({seconds:1}).startOf('second') + 1 - this.time
+                setTimeout(()=>{
+                    this.time = DateTime.fromObject({zone:this.timezone}) //maybe put this starting at if(!timestring || this.time.invalid){; abstract the time assignment
+                    this.clockBattery = setInterval(()=>{
+                        this.time = DateTime.fromObject({zone:this.timezone})
+                    },1000)
+                },startOfSecond)
+            }
+        },
+        changeTime: function(e){
+            clearInterval(this.clockBattery)
+            this.fixed = true
+            this.time = DateTime.fromFormat(`${this.selectedDate} ${this.selectedTime}`,'yyyy-MM-dd HH:mm',{zone:this.timezone})
         }
     }
 }
