@@ -12,6 +12,9 @@
             <h1>
                 {{chosenDate}}
             </h1>
+            <select v-model.lazy="timezone" @change="changeZone"> 
+                <option v-for="zone in tz" v-bind:value="zone.name" v-bind:key="zone.name">{{zone.rawFormat}} </option>
+            </select>
         </div>
         <div class="timegroup"  v-if="localZone != timezone">
             <h2>
@@ -24,7 +27,7 @@
             </h2>
         </div>
         <button v-on:click="share">
-            Share this moment (copies url to this moment to the clipboard)
+            Share this moment (adds link to clipboard)
         </button>
         <div>
             <h4>
@@ -46,6 +49,9 @@
     </div>
 </template>
 <style scoped>
+select{
+    width:50%;
+}
 .hidden{
     visibility:hidden;
 }
@@ -77,8 +83,8 @@ import { DateTime, Settings, IANAZone } from "luxon";
 import copy from 'copy-to-clipboard'
 import {getTimeZones} from "@vvo/tzdb";
 
-console.log('datetime', DateTime);
-console.log('copy', copy);
+// console.log('datetime', DateTime);
+// console.log('copy', copy);
 
 export default {
     created(){
@@ -88,10 +94,10 @@ export default {
             return z1.currentTimeOffsetInMinutes - z2.currentTimeOffsetInMinutes || z1.name.localeCompare(z2.name)
         })
 
-        console.log('zones', this.tz);
-        
-        console.log("route", this.$route);
-        console.log("zone", IANAZone);
+        // console.log('zones', this.tz);
+
+        // console.log("route", this.$route);
+        // console.log("zone", IANAZone);
         this.localZone = Settings.defaultZoneName
         // console.log("tz", );
         if(this.$route.query.zone && IANAZone.isValidZone(this.$route.query.zone)){
@@ -102,7 +108,6 @@ export default {
         let timestring = this.$route.query.time
         if(timestring){
             this.time = DateTime.fromFormat(timestring,'yyyy-MM-dd HH:mm:ss',{zone:this.timezone})
-            // console.log('the toyme mate',this.time);
             this.fixed = true
         }
 
@@ -112,7 +117,6 @@ export default {
         }
         this.selectedDate = this.time.toFormat('yyyy-MM-dd')
         this.selectedTime = this.time.toFormat('HH:mm')
-        console.log("it ran", this.selectedTime);
         
 
         this.startClockIfNotFixed()
@@ -126,7 +130,6 @@ export default {
                 selectedTime:null,
                 clockBattery:null,
                 tz:null,
-                original:Math.floor(4.5)
                 //for some reason, commenting out time and timezone prevents the every-second updating
             }
     },
@@ -150,13 +153,13 @@ export default {
         }
     },
     methods:{
+        changeZone: function(e){
+            this.time= this.time.setZone(this.timezone);
+        },
         share: function(e){
             const loc = window.location.toString().split('?')[0]
             const slug = `?time=${this.time.toFormat('yyyy-MM-dd HH:mm:ss')}&zone=${this.timezone}`
             copy(encodeURI(`${loc}${slug}`))
-        },
-        clicky: function(e){
-            console.log("ive been clicked")
         },
         startClockIfNotFixed: function(){
             if(!this.fixed){
