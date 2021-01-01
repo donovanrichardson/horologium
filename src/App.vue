@@ -8,6 +8,7 @@
       <router-link to="/about">About</router-link>
     </div> -->
     <router-view/>
+    <a href="https://github.com/donovanrichardson/horologium">GitHub</a>
   </div>
 </template>
 
