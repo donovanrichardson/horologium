@@ -9,13 +9,6 @@
     </div> -->
     <router-view/>
     <a href="https://github.com/donovanrichardson/horologium">GitHub</a>
-    <b-container>
-        <b-row>
-          <b-col cols='5' sm=12>1 of 3</b-col>
-          <b-col cols='2' sm=12>2 of 3</b-col>
-          <b-col cols='5' sm=12>3 of 3</b-col>
-        </b-row>
-    </b-container>
   </div>
 </template>
 

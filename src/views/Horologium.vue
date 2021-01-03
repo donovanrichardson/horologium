@@ -1,26 +1,41 @@
 <template>
-    <div>
-        <div class="timegroup">
-            <h2>
-                {{utcString}}
-            </h2>
-        </div>
-        <div class="timegroup">
-            <h1>
-                {{chosenTime}}
-            </h1>
-            <h1>
-                {{chosenDate}}
-            </h1>
-            <select v-model.lazy="timezone" @change="changeZone"> 
-                <option v-for="zone in tz" v-bind:value="zone.name" v-bind:key="zone.name">{{zone.rawFormat}} </option>
-            </select>
-        </div>
-        <div class="timegroup"  v-if="localZone != timezone">
-            <h2>
-                {{localString}}
-            </h2>
-        </div>
+    <div class='home'>
+        <b-container id='main-display'>
+            <b-row>
+            <!-- <b-col cols='12' sm>1 of 3</b-col>
+            <b-col cols='12' sm>3 of 3</b-col>
+            <b-col cols='12' sm>3 of 3</b-col>
+            <b-col cols='12' sm>3 of 3</b-col>
+            <b-col cols='12' sm>3 of 3</b-col> -->
+                <b-col cols='12' lg>
+                    <h1>
+                        {{utcTime}}
+                    </h1>
+                    <h1>
+                        {{utcDate}}
+                    </h1>
+                </b-col>
+                <b-col cols='12' :lg="localZone != timezone? '5':''">
+                    <h1>
+                        {{chosenTime}}
+                    </h1>
+                    <h1>
+                        {{chosenDate}}
+                    </h1>
+                    <select v-model.lazy="timezone" @change="changeZone"> 
+                        <option v-for="zone in tz" v-bind:value="zone.name" v-bind:key="zone.name">{{zone.rawFormat}} </option>
+                    </select>
+                </b-col>
+                <b-col cols='12' lg v-if="localZone != timezone">
+                    <h1>
+                        {{localTime}}
+                    </h1>
+                    <h1>
+                        {{localDate}}
+                    </h1>
+                </b-col>
+            </b-row>
+        </b-container>
         <div class="timegroup">
             <h2>
                 {{unixString}}
@@ -49,6 +64,9 @@
     </div>
 </template>
 <style scoped>
+#main-display{
+    margin:2em auto;
+}
 select{
     width:50%;
 }
@@ -59,9 +77,9 @@ h1, h2, h3{
     padding: .05em;
 }
 
-.timegroup{
+/* .timegroup{
     border-top: 1px solid black;
-}
+} */
 
 h4, button, input{
     margin:.2em;
@@ -134,9 +152,21 @@ export default {
             }
     },
     computed: {
-        utcString(){
-            const utc = this.time.toUTC()
-            return `${utc.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET)} ${utc.toLocaleString(DateTime.DATE_HUGE)}`
+        utc(){
+            return this.time.toUTC()
+        },
+        local(){
+            return this.time.toLocal()
+        },
+        // utcString(){
+        //     const utc = this.time.toUTC()
+        //     return `${utc.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET)} ${utc.toLocaleString(DateTime.DATE_HUGE)}`
+        // },
+        utcTime(){
+            return this.utc.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET)
+        },
+        utcDate(){
+            return this.utc.toLocaleString(DateTime.DATE_HUGE)
         },
         chosenTime(){
             return this.time.toLocaleString(DateTime.TIME_24_WITH_LONG_OFFSET)
@@ -144,9 +174,15 @@ export default {
         chosenDate(){
             return this.time.toLocaleString(DateTime.DATE_HUGE)
         },
-        localString(){
-            const local = this.time.toLocal()
-            return `${local.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET)} ${local.toLocaleString(DateTime.DATE_HUGE)}`
+        // localString(){
+        //     const local = this.time.toLocal()
+        //     return `${local.toLocaleString(DateTime.TIME_24_WITH_SHORT_OFFSET)} ${local.toLocaleString(DateTime.DATE_HUGE)}`
+        // },
+        localTime(){
+            return this.local.toLocaleString(DateTime.TIME_24_WITH_LONG_OFFSET)
+        },
+        localDate(){
+            return this.local.toLocaleString(DateTime.DATE_HUGE)
         },
         unixString(){
             return `UNIX: ${Math.floor(this.time.ts / 1000)}`
