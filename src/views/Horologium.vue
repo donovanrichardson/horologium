@@ -8,31 +8,31 @@
             <b-col cols='12' sm>3 of 3</b-col>
             <b-col cols='12' sm>3 of 3</b-col> -->
                 <b-col cols='12' lg>
-                    <h1>
+                    <h2>
                         {{utcTime}}
-                    </h1>
-                    <h1>
+                    </h2>
+                    <h2>
                         {{utcDate}}
-                    </h1>
+                    </h2>
                 </b-col>
                 <b-col cols='12' :lg="localZone != timezone? '5':''">
-                    <h1>
+                    <h2>
                         {{chosenTime}}
-                    </h1>
-                    <h1>
+                    </h2>
+                    <h2>
                         {{chosenDate}}
-                    </h1>
+                    </h2>
                     <select v-model.lazy="timezone" @change="changeZone"> 
                         <option v-for="zone in tz" v-bind:value="zone.name" v-bind:key="zone.name">{{zone.rawFormat}} </option>
                     </select>
                 </b-col>
                 <b-col cols='12' lg v-if="localZone != timezone">
-                    <h1>
+                    <h2>
                         {{localTime}}
-                    </h1>
-                    <h1>
+                    </h2>
+                    <h2>
                         {{localDate}}
-                    </h1>
+                    </h2>
                 </b-col>
             </b-row>
         </b-container>
